@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstdlib>
+#include <cstdio>
 #include <stack>
 #include <vector>
 #include <string>
@@ -68,9 +70,9 @@ class CDQueue{
 public:
 	CDQueue():count(0){}
     void add(Pet&);
-    Pet& pollAll();
-    Dog& pollDog();
-    Cat& pollCat();
+    Pet* pollAll();
+    Dog* pollDog();
+    Cat* pollCat();
     bool isEmpty();
     bool isEmptyDog();
     bool isEmptyCat();
@@ -85,27 +87,64 @@ void CDQueue::add(Pet& pet){
 		cout << "Neither cat or dog..." << endl;
 }
 
-Pet& CDQueue::pollAll(){
+Pet* CDQueue::pollAll(){
+	Pet* result = nullptr;
 	if(dogq.empty() && catq.empty())
-		return nullptr;
-	if(dogq.empty() || dogq.front().getCount() > catq.front().getCount()){
-		Pet& result = catq.front();
+		return result;
+	if(!catq.empty() && (dogq.empty() || dogq.front().getCount() > catq.front().getCount())){
+		result = &catq.front().getPet();
 		catq.pop();
-	}else{
-		Pet& result = dogq.front();
+	}else if(!dogq.empty() && (catq.empty() || dogq.front().getCount() <= catq.front().getCount())){
+		result = &dogq.front().getPet();
 		dogq.pop();
 	}
 		return result;
 }
 
-Dog& CDQueue::pollDog(){}
-Cat& CDQueue::pollCat(){}
-bool CDQueue::isEmpty(){}
-bool CDQueue::isEmptyDog(){}
-bool CDQueue::isEmptyCat(){}
+Dog* CDQueue::pollDog(){
+	if(dogq.empty())
+		return nullptr;
+	Pet* result = &dogq.front().getPet();
+    dogq.pop();
+    return (Dog *)result;
+}
+
+Cat* CDQueue::pollCat(){
+	if(catq.empty())
+		return nullptr;
+	Pet* result = &catq.front().getPet();
+	catq.pop();
+	return (Cat *)result;
+}
+
+bool CDQueue::isEmpty(){
+    return !(catq.size() + dogq.size());
+}
+
+bool CDQueue::isEmptyDog(){
+	return !dogq.size();
+}
+
+bool CDQueue::isEmptyCat(){
+	return !catq.size();
+}
 
 int main(void){
+	CDQueue q;
+	Pet* p = nullptr;
+	for (int i = 0; i < 10; ++i){
+		if (i & 1 > 0)
+			p = new Dog();
+		else
+			p = new Cat();
+		q.add(*p);
+	}
 
+	for (int i = 0; i < 10; ++i){
+        p = q.pollAll();
+        if (p)
+			printf("%2d: %s\n", i+1,  p->getPetType().c_str());
+	}
 
     return 0;
 }
