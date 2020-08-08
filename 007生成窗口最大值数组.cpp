@@ -13,7 +13,7 @@
 #include <cmath>
 #include <chrono>
 #include <ctime>
-#include <dequeue>
+#include <deque>
 
 using namespace std;
 
@@ -26,14 +26,11 @@ using namespace std;
  *      请实现一个函数： 输入整型数组arr与窗口大小w     输出一个长度为n-w+1的数组res，res[i]表示每一种窗口下的最大值。
 **/
 
-vector<int>& genMaxWindowArray(vector<int>& arr, int w){
-    vector<int> res;
-    dequeue<int> dq;
-    int n = res.size();
-    int max = 0;
+void genMaxWindowArray(vector<int>& arr, int w, vector<int>& res){
+    deque<int> dq;
+    int n = arr.size();
     for (int i = 0; i < n; ++i){
-        while (!dq.empty())
-            if (dq.back() <= arr[i])
+        while (!dq.empty() && arr[dq.back()] <= arr[i])
                 dq.pop_back();
         dq.push_back(i);
         if (dq.front() <= (i - w))
@@ -41,13 +38,12 @@ vector<int>& genMaxWindowArray(vector<int>& arr, int w){
         if (i >= (w - 1))
             res.push_back(arr[dq.front()]);
     }
-    return res;
 }
-
 
 int main(void){
     vector<int> test = {4, 3, 5, 4, 3, 3, 6, 7};
-    vector<int>& res = genMaxWindowArray(test, 3);
+    vector<int> res;
+    genMaxWindowArray(test, 3, res);
     for (auto& i : res)
         printf("%d,", i);
 
